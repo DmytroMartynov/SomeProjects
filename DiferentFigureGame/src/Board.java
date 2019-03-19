@@ -1,5 +1,14 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javafx.scene.canvas.GraphicsContext;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +17,7 @@ public class Board {
 
     private GraphicsContext gc;
 
-    private List< Shape > shapes = new ArrayList<>();
+    private transient List< Shape > shapes = new ArrayList<>();
     private AbstractFigure headFigure;
 
     public Board(GraphicsContext gc) {
@@ -33,6 +42,38 @@ public class Board {
             }
         }
     }
+    public void saver() {
+        try {
+            Save save = new Save(shapes, shapes.indexOf(headFigure));
+            Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.TRANSIENT).setPrettyPrinting().create();
+            String json = gson.toJson(save);
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter("save.txt"))) {
+                bw.write(json);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loader() {
+        try {
+            String fileString = new String(Files.readAllBytes(Paths.get("save.txt")), StandardCharsets.UTF_8);
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+            Save save = gson.fromJson(fileString, Save.class);
+            shapes = save.getlistSaver();
+            headFigure = (AbstractFigure) shapes.get(save.getActiveShape());
+            draw();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     public void addFigure(DiferentFigure figures) {
         switch (figures) {
@@ -103,26 +144,27 @@ public class Board {
     }
 
     public void merge(int findX, int findY) {
-        for (Shape shape : shapes) {
-            if (shape == headFigure) {
-                continue;
-            }
-
-            if (!(shape instanceof FiguresGroup)) {
-                if (checkDistance((AbstractFigure) shape, findX, findY)) {
-                    addToGroup((AbstractFigure) shape);
-                    break;
+            for (Shape shape : shapes) {
+                if (shape == headFigure) {
+                    continue;
                 }
-            } else {
-                for (int j = 0; j < ((FiguresGroup) shape).figuresGroup.size(); j++) {
-                    if (checkDistance(((FiguresGroup) shape).figuresGroup.get(j), findX, findY)) {
+
+                if (!(shape instanceof FiguresGroup)) {
+                    if (checkDistance((AbstractFigure) shape, findX, findY)) {
                         addToGroup((AbstractFigure) shape);
                         break;
+                    }
+                } else {
+                    for (int j = 0; j < ((FiguresGroup) shape).figuresGroup.size(); j++) {
+                        if (checkDistance(((FiguresGroup) shape).figuresGroup.get(j), findX, findY)) {
+                            addToGroup((AbstractFigure) shape);
+                            break;
+                        }
                     }
                 }
             }
         }
-    }
+
 
     private boolean checkDistance(AbstractFigure figure, int findX, int findY) {
         return figure.getX() <= findX

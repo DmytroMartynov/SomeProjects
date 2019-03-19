@@ -1,3 +1,5 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -5,6 +7,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+
 
 public class Main extends Application {
 
@@ -83,6 +86,14 @@ public class Main extends Application {
                     board.increseSize(false);
                     Logger.log("decrese size");
                     break;
+                case S:
+                    board.saver();
+                    Logger.log("save the game results");
+                    break;
+                case L:
+                    board.loader();
+                    Logger.log("load the game results");
+                    break;
             }
         });
 
@@ -92,7 +103,9 @@ public class Main extends Application {
             }
         });
 
+
         new Thread(this::runMainGameLoopInThread).start();
+
     }
 
     @Override

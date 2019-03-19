@@ -9,7 +9,7 @@ public abstract class AbstractFigure implements Shape {
     protected GraphicsContext gc;
     protected double x;
     protected double y;
-    protected List< Shape > shapes;
+    protected transient  List< Shape > shapes;
 
     public AbstractFigure(GraphicsContext gc, double x, double y, List< Shape > shapes) {
         this.gc = gc;
