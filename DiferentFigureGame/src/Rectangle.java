@@ -13,7 +13,7 @@ public class Rectangle extends AbstractFigure {
     public Rectangle(AbstractFigure figure) {
         super(figure);
     }
-
+    public Rectangle(){}
     @Override
     public void draw() {
         gc.setFill(Color.GREEN);

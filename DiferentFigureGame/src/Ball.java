@@ -12,7 +12,8 @@ public class Ball extends AbstractFigure {
     public Ball(AbstractFigure figure) {
         super(figure);
     }
-
+    public Ball() {
+    }
     @Override
     public void draw() {
         gc.setFill(Color.RED);

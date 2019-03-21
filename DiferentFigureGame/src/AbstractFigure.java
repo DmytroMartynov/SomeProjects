@@ -6,10 +6,22 @@ public abstract class AbstractFigure implements Shape {
 
     protected double diameter = 30;
 
-    protected GraphicsContext gc;
+    protected transient GraphicsContext gc;
     protected double x;
     protected double y;
-    protected  List< Shape > shapes;
+    protected transient  List< Shape > shapes;
+
+    public void setGc(GraphicsContext gc) {
+        this.gc = gc;
+    }
+
+    public List< Shape > getShapes() {
+        return shapes;
+    }
+
+    public void setShapes(List< Shape > shapes) {
+        this.shapes = shapes;
+    }
 
     public AbstractFigure(GraphicsContext gc, double x, double y, List< Shape > shapes) {
         this.gc = gc;
@@ -18,11 +30,29 @@ public abstract class AbstractFigure implements Shape {
         this.shapes = shapes;
     }
 
-    protected AbstractFigure(AbstractFigure figure) {
+    public void setDiameter(double diameter) {
+        this.diameter = diameter;
+    }
+
+    public GraphicsContext getGc() {
+        return gc;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public AbstractFigure(AbstractFigure figure) {
         this(figure.gc, figure.x, figure.y, figure.shapes);
         this.diameter = figure.diameter;
     }
+    public AbstractFigure(){
 
+    }
     public void increseSize(boolean type) {
         if (type) {
             diameter += 5;

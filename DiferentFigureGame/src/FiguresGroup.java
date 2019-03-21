@@ -13,7 +13,7 @@ public class FiguresGroup extends AbstractFigure {
     protected double minY;
     protected double diameterX;
     protected double diameterY;
-    protected GraphicsContext gc;
+    protected transient GraphicsContext gc;
 
     public FiguresGroup(GraphicsContext gc, double x, double y, List< Shape > shapes) {
         super(gc, x, y, shapes);
@@ -21,6 +21,77 @@ public class FiguresGroup extends AbstractFigure {
         minY = gc.getCanvas().getHeight();
         minX = gc.getCanvas().getWidth();
     }
+
+    public FiguresGroup() {
+
+    }
+
+    public void setFiguresGroup(List< AbstractFigure > figuresGroup) {
+        this.figuresGroup = figuresGroup;
+    }
+
+    public void setMaxX(double maxX) {
+        this.maxX = maxX;
+    }
+
+    public void setMaxY(double maxY) {
+        this.maxY = maxY;
+    }
+
+    public void setMinX(double minX) {
+        this.minX = minX;
+    }
+
+    public void setMinY(double minY) {
+        this.minY = minY;
+    }
+
+    public void setDiameterX(double diameterX) {
+        this.diameterX = diameterX;
+    }
+
+    public void setDiameterY(double diameterY) {
+        this.diameterY = diameterY;
+    }
+
+    public List< AbstractFigure > getFiguresGroup() {
+        return figuresGroup;
+    }
+
+    public double getMaxX() {
+        return maxX;
+    }
+
+    public double getMaxY() {
+        return maxY;
+    }
+
+    public double getMinX() {
+        return minX;
+    }
+
+    public double getMinY() {
+        return minY;
+    }
+
+    public double getDiameterX() {
+        return diameterX;
+    }
+
+    public double getDiameterY() {
+        return diameterY;
+    }
+
+    public GraphicsContext getGc() {
+        return gc;
+    }
+
+    @Override
+    public void setGc(GraphicsContext gc) {
+        this.gc = gc;
+    }
+
+
 
     public FiguresGroup(AbstractFigure figure) {
         this(figure.gc, 0, 0, figure.shapes);
@@ -105,6 +176,8 @@ public class FiguresGroup extends AbstractFigure {
                 break;
         }
     }
+
+
 
     public void addToGroup(AbstractFigure figure) {
         figuresGroup.add(figure);

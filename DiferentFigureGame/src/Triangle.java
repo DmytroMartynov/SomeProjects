@@ -13,6 +13,10 @@ public class Triangle extends AbstractFigure {
         super(figure);
     }
 
+    public Triangle() {
+
+    }
+
     @Override
     public void draw() {
         gc.setFill(Color.BLUE);

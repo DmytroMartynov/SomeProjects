@@ -1,11 +1,10 @@
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import javafx.scene.canvas.GraphicsContext;
 
+import javafx.scene.canvas.GraphicsContext;
+import flexjson.JSONDeserializer;
+import flexjson.JSONSerializer;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -15,9 +14,9 @@ import java.util.List;
 public class Board {
 
 
-    private GraphicsContext gc;
+    private transient GraphicsContext gc;
 
-    private transient List< Shape > shapes = new ArrayList<>();
+    private List< Shape > shapes = new ArrayList<>();
     private AbstractFigure headFigure;
 
     public Board(GraphicsContext gc) {
@@ -43,36 +42,49 @@ public class Board {
         }
     }
     public void saver() {
-        try {
-            Save save = new Save(shapes, shapes.indexOf(headFigure));
-            Gson gson = new GsonBuilder().excludeFieldsWithModifiers(Modifier.TRANSIENT).setPrettyPrinting().create();
-            String json = gson.toJson(save);
+        Save save = new Save(shapes, shapes.indexOf(headFigure));
 
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter("save.txt"))) {
-                bw.write(json);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
+        JSONSerializer serializer = new JSONSerializer().prettyPrint(true);
+        String js = serializer.deepSerialize(save);
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("save.txt"))) {
+            bw.write(js);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+
     public void loader() {
         try {
             String fileString = new String(Files.readAllBytes(Paths.get("save.txt")), StandardCharsets.UTF_8);
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-            Save save = gson.fromJson(fileString, Save.class);
-            shapes = save.getlistSaver();
+            JSONDeserializer<Save> deserializer = new JSONDeserializer<>();
+            Save save = deserializer.deserialize(fileString);
+            List<Shape> shapesTmp = save.getlistSaver();
+
+            for (Shape shape : shapesTmp) {
+                if (shape instanceof FiguresGroup) {
+                    ((FiguresGroup) shape).setGc(gc);
+                    for (int j = 0; j < ((FiguresGroup) shape).getFiguresGroup().size(); j++) {
+                        AbstractFigure tmpFigure = ((FiguresGroup) shape).getFiguresGroup().get(j);
+                        tmpFigure.setGc(gc);
+                    }
+
+                    continue;
+                }
+                ((AbstractFigure) shape).setGc(gc);
+            }
+
+            shapes = shapesTmp;
             headFigure = (AbstractFigure) shapes.get(save.getActiveShape());
-            draw();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
+
 
 
     public void addFigure(DiferentFigure figures) {
